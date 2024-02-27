@@ -43,23 +43,13 @@ db.connect(err => {
   console.log('MySQL Connected...');
 });
 
-// upload 
-
-app.post('/upload',upload.single('image'),(req, res) => {
-//    console.log(req.file);
-const image=req.file.filename;
-const sql="UPDATE schools SET image=?";
-db.query(sql,[image],(err, result)=>{
-    if(err) return  res.json({Message:"Error "});
-    return res.json({Status:"Success"})
-})
-})
 
 // Routes
-app.post('/api/schools', (req, res) => {
-  const { name, location, establishedYear } = req.body;
-  const INSERT_SCHOOL_QUERY = `INSERT INTO schools (name, location, established_year) VALUES (?, ?, ?)`;
-  db.query(INSERT_SCHOOL_QUERY, [name, location, establishedYear], (err, result) => {
+app.post('/api/schools',upload.single('image'), (req, res) => {
+  const { name,board, location, establishedYear} = req.body;
+  const image=req.file.filename;
+  const INSERT_SCHOOL_QUERY = `INSERT INTO schools (name,board, location, established_year, image) VALUES (?, ?, ?,?,?)`;
+  db.query(INSERT_SCHOOL_QUERY, [name,board, location, establishedYear, image], (err, result) => {
     if (err) {
       console.error(err);
       res.status(500).send('Error saving school');
@@ -81,14 +71,14 @@ app.get('/api/schools', (req, res) => {
   });
 });
 
-app.get('/',(req,res)=>{
-    const sql='select * from schools';
-    db.query(sql,(err,result)=>{
-        if(err) return  res.json("Error");
+// app.get('/',(req,res)=>{
+//     const sql='select * from schools';
+//     db.query(sql,(err,result)=>{
+//         if(err) return  res.json("Error");
 
-        return res.json(result);
-    } )
-})
+//         return res.json(result);
+//     } )
+// })
 
 // Start Server
 app.listen(port, () => {
